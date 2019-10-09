@@ -336,6 +336,8 @@ scheduler(void)
       if(p->state != RUNNABLE)
         continue;
 
+      p->priority = 10;
+
       // Switch to chosen process.  It is the process's job
       // to release ptable.lock and then reacquire it
       // before jumping back to us.
@@ -531,4 +533,43 @@ procdump(void)
     }
     cprintf("\n");
   }
+}
+
+
+int
+cps(void)
+{
+  static char *states[] = {
+  [UNUSED]    "unused",
+  [EMBRYO]    "embryo",
+  [SLEEPING]  "sleep ",
+  [RUNNABLE]  "runble",
+  [RUNNING]   "run   ",
+  [ZOMBIE]    "zombie"
+  };
+
+  struct proc *p;
+  char *state;
+  
+
+  for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
+      
+      if(p->state == UNUSED)
+      {
+        continue;
+      }
+
+      if(p->state >= 0 && p->state < NELEM(states) && states[p->state])
+      {  
+        state = states[p->state];
+      }
+      else
+      {  
+        state = "???";
+      }
+
+      cprintf("%d %s %s %d\n", p->pid, p->name, state, p->priority);
+  }
+
+  return 0;
 }
